@@ -29,6 +29,8 @@ import com.example.collegeschedule2.ui.schedule.ScheduleScreen
 import com.example.collegeschedule2.ui.theme.CollegeScheduleTheme
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.collegeschedule2.ui.schedule.GroupsSelecting
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +45,9 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun CollegeScheduleApp() {
+    var selectedGroup by rememberSaveable {
+        mutableStateOf<String?>(null)
+    }
     var currentDestination by rememberSaveable {
         mutableStateOf(AppDestinations.HOME) }
     val retrofit = remember {
@@ -72,7 +77,18 @@ fun CollegeScheduleApp() {
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
-                AppDestinations.HOME -> ScheduleScreen()
+                AppDestinations.HOME -> {
+                    if (selectedGroup == null) {
+                        GroupsSelecting(
+                            onGroupSelected = { group ->
+                                selectedGroup = group
+                            }
+                        )
+                    } else {
+                        ScheduleScreen(groupName = selectedGroup!!)
+                    }
+                }
+
                 AppDestinations.FAVORITES ->
                     Text("Избранные группы", modifier =
                         Modifier.padding(innerPadding))

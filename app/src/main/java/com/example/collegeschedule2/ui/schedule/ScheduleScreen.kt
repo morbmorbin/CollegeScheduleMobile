@@ -12,7 +12,8 @@ import com.example.collegeschedule2.data.dto.ScheduleByDateDto
 import com.example.collegeschedule2.data.network.RetrofitInstance
 import com.example.collegeschedule2.units.getWeekDateRange
 @Composable
-fun ScheduleScreen() {
+fun ScheduleScreen(groupName: String) {
+
     var schedule by remember {
         mutableStateOf<List<ScheduleByDateDto>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -21,10 +22,11 @@ fun ScheduleScreen() {
         val (start, end) = getWeekDateRange()
         try {
             schedule = RetrofitInstance.api.getSchedule(
-                "ИС-12",
+                groupName,
                 start,
                 end
             )
+
         } catch (e: Exception) {
             error = e.message
         } finally {
