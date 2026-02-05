@@ -50,6 +50,10 @@ fun CollegeScheduleApp() {
     }
     var currentDestination by rememberSaveable {
         mutableStateOf(AppDestinations.HOME) }
+
+    var favoriteGroups by rememberSaveable {
+        mutableStateOf(setOf<String>())
+    }
     val retrofit = remember {
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:5268/") // localhost для Android Emulator
@@ -75,26 +79,58 @@ fun CollegeScheduleApp() {
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        @Suppress("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold(modifier = Modifier.fillMaxSize()) {
             when (currentDestination) {
                 AppDestinations.HOME -> {
                     if (selectedGroup == null) {
                         GroupsSelecting(
+                            favorites = favoriteGroups,
                             onGroupSelected = { group ->
                                 selectedGroup = group
+                            },
+                            onToggleFavorite = { group ->
+                                favoriteGroups =
+                                    if (favoriteGroups.contains(group))
+                                        favoriteGroups - group
+                                    else
+                                        favoriteGroups + group
                             }
                         )
+
                     } else {
-                        ScheduleScreen(groupName = selectedGroup!!)
+                        ScheduleScreen(
+                            groupName = selectedGroup!!,
+                            isFavorite = favoriteGroups.contains(selectedGroup!!),
+                            onBack = {
+                                selectedGroup = null
+                            },
+                            onToggleFavorite = {
+                                favoriteGroups =
+                                    if (favoriteGroups.contains(selectedGroup!!))
+                                        favoriteGroups - selectedGroup!!
+                                    else
+                                        favoriteGroups + selectedGroup!!
+                            }
+                        )
                     }
+
                 }
 
                 AppDestinations.FAVORITES ->
-                    Text("Избранные группы", modifier =
-                        Modifier.padding(innerPadding))
-                AppDestinations.PROFILE ->
-                    Text("Профиль студента", modifier =
-                        Modifier.padding(innerPadding))
+                    GroupsSelecting(
+                        favorites = favoriteGroups,
+                        onlyFavorites = true,
+                        onGroupSelected = { group ->
+                            selectedGroup = group
+                            currentDestination = AppDestinations.HOME
+                        },
+                        onToggleFavorite = { group ->
+                            favoriteGroups = favoriteGroups - group
+                        }
+                    )
+
+
             }
         }
     }
@@ -104,6 +140,5 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    FAVORITES("Favorites", Icons.Default.Favorite)
 }

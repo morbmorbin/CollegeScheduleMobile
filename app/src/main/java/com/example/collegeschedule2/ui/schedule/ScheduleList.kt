@@ -13,34 +13,76 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.collegeschedule2.data.dto.ScheduleByDateDto
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.CardDefaults
+
 @Composable
-fun ScheduleList(data: List<ScheduleByDateDto>) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+fun ScheduleList(
+    data: List<ScheduleByDateDto>,
+    modifier: Modifier = Modifier
+) {
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         items(data) { day ->
+
             Text(
-                "${day.lessonDate} (${day.weekday})",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(8.dp)
+                text = "${day.lessonDate} • ${day.weekday}",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(vertical = 8.dp)
             )
+
             if (day.lessons.isEmpty()) {
-                Text("Информация отсутствует",
+                Text(
+                    text = "Занятий нет",
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
             } else {
+
                 day.lessons.forEach { lesson ->
                     Card(
                         modifier = Modifier
-                            .padding(8.dp)
                             .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
                     ) {
-                        Column(Modifier.padding(8.dp)) {
-                            Text("Пара ${lesson.lessonNumber} (${lesson.time})")
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+
+                            Text(
+                                text = "Пара ${lesson.lessonNumber} · ${lesson.time}",
+                                style = MaterialTheme.typography.labelLarge
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
                             lesson.groupParts.forEach { (part, info) ->
                                 if (info != null) {
-                                    Text("$part: ${info.subject}")
-                                    Text(info.teacher)
-                                    Text("${info.building}, ${info.classroom}")
+
+                                    Text(
+                                        text = info.subject,
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+
+                                    Text(
+                                        text = info.teacher,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+
+                                    Text(
+                                        text = "${info.building}, аудитория ${info.classroom}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
                         }

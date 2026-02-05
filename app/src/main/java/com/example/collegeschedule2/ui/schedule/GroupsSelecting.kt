@@ -36,22 +36,34 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.ArrowBack
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupsSelecting(
-    onGroupSelected: (String) -> Unit
+    favorites: Set<String>,
+    onlyFavorites: Boolean = false,
+    onGroupSelected: (String) -> Unit,
+    onToggleFavorite: (String) -> Unit
 ) {
     var groups by remember { mutableStateOf<List<GroupsDto>>(emptyList()) }
     var search by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedGroup by remember { mutableStateOf("") }
+
 
     LaunchedEffect(Unit) {
         groups = RetrofitInstance.api.getGroups()
     }
 
-    val filtered = groups.filter {
-        it.groupName.contains(search, ignoreCase = true)
-    }
+    val filtered = groups
+        .filter { it.groupName.contains(search, ignoreCase = true) }
+        .filter { !onlyFavorites || favorites.contains(it.groupName) }
+
 
     Scaffold(
         topBar = {
@@ -87,24 +99,39 @@ fun GroupsSelecting(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn {
-                items(filtered) { group ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .clickable {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    value = search,
+                    onValueChange = {
+                        search = it
+                        expanded = true
+                    },
+                    label = { Text("Выберите группу") },
+                    singleLine = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                    }
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    filtered.forEach { group ->
+                        DropdownMenuItem(
+                            text = { Text(group.groupName) },
+                            onClick = {
+                                search = group.groupName
+                                selectedGroup = group.groupName
+                                expanded = false
                                 onGroupSelected(group.groupName)
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFFF9C4) // светло-жёлтый
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = group.groupName,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
+                            }
                         )
                     }
                 }
