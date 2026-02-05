@@ -7,7 +7,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,9 +32,8 @@ fun ScheduleList(
     data: List<ScheduleByDateDto>,
     modifier: Modifier = Modifier
 ) {
-
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
@@ -50,12 +59,10 @@ fun ScheduleList(
                             .fillMaxWidth()
                             .padding(vertical = 6.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = Color(0xFFFFF9C4) // светло-желтый
                         )
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
 
                             Text(
                                 text = "Пара ${lesson.lessonNumber} · ${lesson.time}",
@@ -67,20 +74,50 @@ fun ScheduleList(
                             lesson.groupParts.forEach { (part, info) ->
                                 if (info != null) {
 
-                                    Text(
-                                        text = info.subject,
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
+                                    // определяем эмодзи для предмета
+                                    val lower = info.subject.lowercase()
+                                    val emoji = when {
+                                        listOf(
+                                            "информатика", "программирование", "базы данных", "алгоритмы",
+                                            "ос и сети", "проектирование по", "цифровая грамотность",
+                                            "мобильная разработка", "веб-разработка", "искусственный интеллект",
+                                            "машинное обучение", "робототехника", "интернет вещей", "кибербезопасность"
+                                        ).any { lower.contains(it) } -> "💻"
 
-                                    Text(
-                                        text = info.teacher,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                        listOf(
+                                            "русский язык", "литература", "иностранный язык", "английский язык",
+                                            "французский язык", "немецкий язык", "испанский язык",
+                                            "психология", "правоведение", "социология", "этика", "философия",
+                                            "маркетинг", "экономика", "управление проектами", "дизайн интерфейсов"
+                                        ).any { lower.contains(it) } -> "📚"
 
-                                    Text(
-                                        text = "${info.building}, аудитория ${info.classroom}",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
+                                        listOf(
+                                            "математика", "логика", "дискретная математика",
+                                            "теория вероятностей", "статистика"
+                                        ).any { lower.contains(it) } -> "🧮"
+
+                                        else -> "🎓"
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = "$emoji ${info.subject}",
+                                                style = MaterialTheme.typography.titleMedium
+                                            )
+                                            Text(
+                                                text = info.teacher,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                text = "${info.building}, аудитория ${info.classroom}",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
+                                    }
 
                                     Spacer(modifier = Modifier.height(8.dp))
                                 }
