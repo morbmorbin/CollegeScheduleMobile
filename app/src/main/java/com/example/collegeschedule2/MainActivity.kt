@@ -30,6 +30,7 @@ import com.example.collegeschedule2.ui.theme.CollegeScheduleTheme
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.example.collegeschedule2.ui.schedule.GroupsSelecting
+import com.example.collegeschedule2.ui.schedule.Favorites
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,18 +118,19 @@ fun CollegeScheduleApp() {
 
                 }
 
-                AppDestinations.FAVORITES ->
-                    GroupsSelecting(
-                        favorites = favoriteGroups,
-                        onlyFavorites = true,
-                        onGroupSelected = { group ->
-                            selectedGroup = group
-                            currentDestination = AppDestinations.HOME
-                        },
-                        onToggleFavorite = { group ->
-                            favoriteGroups = favoriteGroups - group
-                        }
-                    )
+                AppDestinations.FAVORITES -> Favorites(
+                    favorites = favoriteGroups,
+                    onGroupSelected = { group ->
+                        selectedGroup = group
+                        currentDestination = AppDestinations.HOME
+                    },
+                    onRemoveFavorite = { group ->
+                        favoriteGroups = favoriteGroups - group
+                    }
+                )
+
+
+
 
 
             }

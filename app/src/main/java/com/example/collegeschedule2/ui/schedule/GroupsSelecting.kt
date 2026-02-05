@@ -88,7 +88,7 @@ fun GroupsSelecting(
                 .fillMaxSize()
         ) {
 
-            // Search
+
             OutlinedTextField(
                 value = search,
                 onValueChange = { search = it },
